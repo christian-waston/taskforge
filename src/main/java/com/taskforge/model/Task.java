@@ -3,44 +3,31 @@ package com.taskforge.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "task")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Task {
-
     @Id
-    private String id; // Custom ID
-
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    private LocalDate dueDate;
+    
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
+    
     private String title;
-
-    @Column(length = 2000)
-    private String description;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TaskStatus status = TaskStatus.TODO;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TaskPriority priority = TaskPriority.MEDIUM;
-
-    private LocalDate deadline;
-
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
+    private int priority;
+    
+    // Many-to-One with Project
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id")
     private Project project;
-
+    
+    // Many-to-One with TeamMember
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignee_id")
-    private User assignee;
+    @JoinColumn(name = "team_member_id")
+    private TeamMember teamMember;
 }
